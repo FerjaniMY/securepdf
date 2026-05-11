@@ -27,6 +27,14 @@ Graceful degradation
 If Ollama isn't running or the model isn't pulled, `detect_pages` logs a warning
 and returns an empty list. The pipeline as a whole still produces Stage 1
 detections — Phase 2 doesn't hard-require Ollama to be useful.
+
+Security note: log content
+--------------------------
+DEBUG-level logs in this module may include substrings of the page text or the
+LLM's raw response — both of which can contain PII for legitimate documents.
+The default logging level (INFO) is safe to ship logs from. If you raise to
+DEBUG for troubleshooting, do so on a copy of the document, or redirect logs
+to a local file that doesn't leave the machine.
 """
 
 from __future__ import annotations

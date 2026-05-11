@@ -126,6 +126,11 @@ def _overlay_text(
     if overlay_mode == "type":
         return f"[{d.entity_type}]"
     if overlay_mode == "pseudonym":
-        assert pmap is not None  # checked at function entry
+        # Defensive raise (not assert) — `assert` is stripped under `python -O`
+        # and a stripped check would propagate as `AttributeError: 'NoneType'
+        # object has no attribute 'pseudonym_for'`. The function entry guard
+        # should already have caught this, but belt-and-braces here.
+        if pmap is None:
+            raise ValueError("text_overlay='pseudonym' requires a pseudonym_map")
         return pmap.pseudonym_for(d.entity_type, d.text)
     return None

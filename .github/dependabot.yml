@@ -1,0 +1,34 @@
+# Dependabot — keep Python deps and GitHub Actions versions fresh + CVE-free.
+# Runs weekly so PRs don't pile up. Security updates fire immediately.
+
+version: 2
+updates:
+  # Python deps from pyproject.toml.
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps"
+    labels:
+      - "dependencies"
+      - "python"
+    # Group routine bumps so we don't get one PR per bump.
+    groups:
+      python-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # GitHub Actions used in workflows under .github/workflows/.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
+      - "github-actions"
