@@ -1,10 +1,16 @@
 # SecurePDF
 
+[![Test](https://github.com/FerjaniMY/securepdf/actions/workflows/test.yml/badge.svg)](https://github.com/FerjaniMY/securepdf/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+
 Local AI PDF redaction & anonymization. Strip sensitive data (PII, PHI, financial,
 custom entities) from PDFs **on your machine** before you send the document to a
 cloud LLM like ChatGPT or Claude.
 
 > Nothing leaves your laptop. No GPU required.
+
+**See [INSTALL.md](INSTALL.md) for setup, system requirements, and per-OS notes.**
 
 ## Status
 
@@ -12,7 +18,7 @@ cloud LLM like ChatGPT or Claude.
 - **Phase 2 — Detection** ✅ Presidio Stage 1 + Gemma 2 2B Stage 2 via Ollama + merger
 - **Phase 3 — Redaction & anonymization** ✅ true PDF redaction + pseudonymized text export
 - **Phase 4 — PySide6 desktop GUI** ✅ drag-drop, detection review, PDF preview with overlays, Ollama banner
-- **Phase 5 — Polish & packaging** ⏳ next (PyInstaller, batch processing)
+- **Phase 5 — Polish & packaging** ✅ batch CLI, PyInstaller spec, GitHub Actions CI, INSTALL.md
 
 ## Architecture
 
@@ -121,6 +127,13 @@ securepdf-redact   medical_record.pdf --text-overlay pseudonym           # cross
 # Desktop GUI (Phase 4)
 securepdf-gui
 # or: python -m securepdf.gui
+
+# Batch processing (Phase 5) — process every PDF in a folder
+securepdf-batch  ./inputs ./outputs
+securepdf-batch  ./inputs ./outputs --mode pdf --workers 4
+securepdf-batch  ./inputs ./outputs --profile entities.yml   # custom entities
+# Resume-on-rerun: files with existing outputs are skipped automatically.
+# A manifest.json is written to the output dir summarizing every file's result.
 ```
 
 Custom entity profile example (`entities.yml`):
