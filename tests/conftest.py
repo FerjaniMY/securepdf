@@ -2,13 +2,48 @@
 
 Phase 2 tests need PageContent instances with realistic bboxes. We build them
 in memory rather than rendering a PDF — keeps tests fast and deterministic.
+
+Phase 4 GUI tests need a headless Qt. We set QT_QPA_PLATFORM=offscreen at the
+TOP of this module — before anyone imports PySide6 — so all later imports pick
+it up. The fixture `qapp` provides a singleton QApplication that survives the
+whole test session.
 """
 
 from __future__ import annotations
 
+import os
+# Must be set before PySide6 is imported. conftest.py runs before any test
+# module, and many test modules import PySide6 at module top, so we set this
+# here unconditionally — there's no display server in CI.
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+
 import pytest
 
 from securepdf.pdf.models import PageContent, TextSpan
+
+
+@pytest.fixture(scope="session")
+def qapp():
+    """Session-scoped QApplication for any test that constructs Qt widgets.
+
+    Reusing a single QApplication across tests is the supported PySide6 pattern —
+    multiple QApplications per process aren't allowed. Tests that don't need Qt
+    simply don't request this fixture.
+
+    On systems without the required graphics shared libraries (libGL, libEGL),
+    importing PySide6.QtWidgets raises ImportError even with QT_QPA_PLATFORM=
+    offscreen. We skip rather than fail in that case — the same tests pass on
+    any developer machine or a CI image with the system libs installed
+    (`apt install libgl1` on Debian/Ubuntu).
+    """
+    try:
+        from PySide6.QtWidgets import QApplication
+    except ImportError as e:
+        pytest.skip(f"PySide6 import failed (missing system libs?): {e}")
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication([])
+    yield app
 
 
 def _span(text: str, x0: float, y0: float, page: int = 0) -> TextSpan:

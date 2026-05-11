@@ -11,8 +11,8 @@ cloud LLM like ChatGPT or Claude.
 - **Phase 1 — Foundations** ✅ project scaffold, PDF text extraction (PyMuPDF), OCR fallback (Tesseract)
 - **Phase 2 — Detection** ✅ Presidio Stage 1 + Gemma 2 2B Stage 2 via Ollama + merger
 - **Phase 3 — Redaction & anonymization** ✅ true PDF redaction + pseudonymized text export
-- **Phase 4 — PySide6 desktop GUI** ⏳ next
-- **Phase 5 — Polish & packaging** ⏳
+- **Phase 4 — PySide6 desktop GUI** ✅ drag-drop, detection review, PDF preview with overlays, Ollama banner
+- **Phase 5 — Polish & packaging** ⏳ next (PyInstaller, batch processing)
 
 ## Architecture
 
@@ -68,6 +68,16 @@ Redacted PDF                       Anonymized text
 - `pdf_renderer.py` — PyMuPDF true redaction (text physically removed, not just covered)
 - `pipeline.py` — `redact(pdf, detections)` orchestrator + `securepdf-redact` CLI
 
+**Desktop GUI (`securepdf.gui`)**
+- `document_session.py` — per-document state (pages, detections, accept/reject decisions); pure data, no Qt deps
+- `worker.py` — `PipelineWorker` QThread runs extract + detect off the UI thread
+- `pdf_viewer.py` — page renderer with detection bbox overlays color-coded by decision
+- `detection_panel.py` — reviewable list with type/text/conf/source columns, accept-all/reject-all
+- `onboarding.py` — first-run Ollama detection banner (dismissable)
+- `settings_dialog.py` — preferences (Stage 2 toggle, sensitivity, Ollama host, spaCy model)
+- `main_window.py` — MainWindow tying everything together
+- `app.py` — `main()` entry point
+
 ## Install
 
 ```bash
@@ -107,6 +117,10 @@ securepdf-redact   medical_record.pdf
 securepdf-redact   medical_record.pdf --mode text                        # text only
 securepdf-redact   medical_record.pdf --mode pdf --text-overlay type     # label boxes
 securepdf-redact   medical_record.pdf --text-overlay pseudonym           # cross-ref text & PDF
+
+# Desktop GUI (Phase 4)
+securepdf-gui
+# or: python -m securepdf.gui
 ```
 
 Custom entity profile example (`entities.yml`):
