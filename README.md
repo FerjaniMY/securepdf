@@ -10,8 +10,8 @@ cloud LLM like ChatGPT or Claude.
 
 - **Phase 1 — Foundations** ✅ project scaffold, PDF text extraction (PyMuPDF), OCR fallback (Tesseract)
 - **Phase 2 — Detection** ✅ Presidio Stage 1 + Gemma 2 2B Stage 2 via Ollama + merger
-- **Phase 3 — Redaction & anonymization** ⏳ next
-- **Phase 4 — PySide6 desktop GUI** ⏳
+- **Phase 3 — Redaction & anonymization** ✅ true PDF redaction + pseudonymized text export
+- **Phase 4 — PySide6 desktop GUI** ⏳ next
 - **Phase 5 — Polish & packaging** ⏳
 
 ## Architecture
@@ -62,6 +62,12 @@ Redacted PDF                       Anonymized text
 - `custom_entities.py` — YAML profile loader (regex / keywords / LLM descriptions)
 - `pipeline.py` — full `detect(pages)` orchestrator + `securepdf-detect` CLI
 
+**Redaction (`securepdf.redaction`)**
+- `pseudonyms.py` — `PseudonymMap` (consistent `[PERSON_1]`-style aliasing, case-insensitive)
+- `text_export.py` — anonymized text with pseudonyms substituted in place
+- `pdf_renderer.py` — PyMuPDF true redaction (text physically removed, not just covered)
+- `pipeline.py` — `redact(pdf, detections)` orchestrator + `securepdf-redact` CLI
+
 ## Install
 
 ```bash
@@ -95,6 +101,12 @@ securepdf-extract  medical_record.pdf
 securepdf-detect   medical_record.pdf
 securepdf-detect   medical_record.pdf --no-stage2   # Presidio only (no Ollama)
 securepdf-detect   medical_record.pdf --profile entities.yml   # custom entities
+
+# Full pipeline: extract → detect → redact (Phase 3)
+securepdf-redact   medical_record.pdf
+securepdf-redact   medical_record.pdf --mode text                        # text only
+securepdf-redact   medical_record.pdf --mode pdf --text-overlay type     # label boxes
+securepdf-redact   medical_record.pdf --text-overlay pseudonym           # cross-ref text & PDF
 ```
 
 Custom entity profile example (`entities.yml`):
