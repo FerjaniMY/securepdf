@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "securepdf"
-version = "0.4.0"
+version = "0.5.0"
 description = "Local AI PDF redaction & anonymization — strip sensitive data before sending docs to cloud LLMs."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -40,6 +40,7 @@ prod = [
 securepdf-extract = "securepdf.pdf.pipeline:_cli"
 securepdf-detect = "securepdf.detection.pipeline:_cli"
 securepdf-redact = "securepdf.redaction.pipeline:_cli"
+securepdf-batch = "securepdf.batch.pipeline:_cli"
 securepdf-gui = "securepdf.gui.app:main"
 
 [tool.setuptools.packages.find]
