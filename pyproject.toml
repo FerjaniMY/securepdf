@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "securepdf"
-version = "0.3.0"
+version = "0.4.0"
 description = "Local AI PDF redaction & anonymization — strip sensitive data before sending docs to cloud LLMs."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -22,6 +22,7 @@ dependencies = [
     "spacy>=3.7",             # NER backbone used by Presidio
     "requests>=2.31",         # HTTP client for Ollama API (honors HTTPS_PROXY)
     "PyYAML>=6.0",            # Custom entity profile loading
+    "PySide6>=6.6",           # Desktop GUI (Phase 4)
 ]
 
 [project.optional-dependencies]
@@ -39,6 +40,7 @@ prod = [
 securepdf-extract = "securepdf.pdf.pipeline:_cli"
 securepdf-detect = "securepdf.detection.pipeline:_cli"
 securepdf-redact = "securepdf.redaction.pipeline:_cli"
+securepdf-gui = "securepdf.gui.app:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
