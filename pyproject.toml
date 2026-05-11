@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "securepdf"
+version = "0.1.0"
+description = "Local AI PDF redaction & anonymization — strip sensitive data before sending docs to cloud LLMs."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "SecurePDF" }]
+
+# Phase 1 — PDF I/O + OCR.
+# Detection (presidio, spacy, ollama client) and GUI (PySide6) deps come in later phases.
+dependencies = [
+    "pymupdf>=1.24",       # PDF text extraction WITH bboxes + true redaction primitives
+    "pytesseract>=0.3.10", # Python wrapper over the system `tesseract` binary
+    "Pillow>=10.0",        # Image handling for OCR page rendering
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.5",
+]
+
+[project.scripts]
+securepdf-extract = "securepdf.pdf.pipeline:_cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
