@@ -73,11 +73,28 @@ class BatchResult:
 
 
 def _output_paths(input_pdf: Path, input_root: Path, output_root: Path, mode: Mode) -> tuple[Path | None, Path | None]:
-    """Compute (output_pdf_path, output_text_path) — None for modes we skip."""
+    """Compute (output_pdf_path, output_text_path) — None for modes we skip.
+
+    Defensive: verifies the computed paths land inside `output_root` after
+    resolution. `Path.relative_to()` already prevents most escapes upstream,
+    but this guard catches future code changes where a refactor might
+    accidentally introduce a write outside the intended tree.
+    """
     rel = input_pdf.relative_to(input_root)
     base = output_root / rel
     out_pdf = base.with_suffix(".redacted.pdf") if mode in ("pdf", "both") else None
     out_txt = base.with_suffix(".anonymized.txt") if mode in ("text", "both") else None
+    # Belt-and-braces: each computed path must stay inside output_root.
+    resolved_root = output_root.resolve()
+    for p in (out_pdf, out_txt):
+        if p is None:
+            continue
+        try:
+            p.resolve().relative_to(resolved_root)
+        except ValueError as e:
+            raise ValueError(
+                f"computed output path escapes output_root: {p} (root={resolved_root})"
+            ) from e
     return out_pdf, out_txt
 
 
