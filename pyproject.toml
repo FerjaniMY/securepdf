@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "securepdf"
-version = "0.5.0"
+version = "0.5.1"
 description = "Local AI PDF redaction & anonymization — strip sensitive data before sending docs to cloud LLMs."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -15,14 +15,16 @@ authors = [{ name = "SecurePDF" }]
 # Phase 2 — Detection: Presidio (Stage 1) + Ollama/Gemma (Stage 2).
 # Phase 4 GUI (PySide6) deps come later.
 dependencies = [
-    "pymupdf>=1.24",          # PDF text extraction WITH bboxes + true redaction primitives
-    "pytesseract>=0.3.10",    # Python wrapper over the system `tesseract` binary
-    "Pillow>=10.0",           # Image handling for OCR page rendering
-    "presidio-analyzer>=2.2", # Stage 1: PII detection engine
-    "spacy>=3.7",             # NER backbone used by Presidio
-    "requests>=2.31",         # HTTP client for Ollama API (honors HTTPS_PROXY)
-    "PyYAML>=6.0",            # Custom entity profile loading
-    "PySide6>=6.6",           # Desktop GUI (Phase 4)
+    # Lower bounds tightened in v0.5.1 to versions free of known CVEs as of
+    # release; upper bounds prevent surprise major-version breakage.
+    "pymupdf>=1.24.10,<2",       # PDF text extraction WITH bboxes + true redaction primitives
+    "pytesseract>=0.3.10,<1",    # Python wrapper over the system `tesseract` binary
+    "Pillow>=10.4.0,<12",        # Image handling for OCR page rendering (10.4+ CVE-fixed)
+    "presidio-analyzer>=2.2.355,<3",  # Stage 1: PII detection engine
+    "spacy>=3.7,<4",             # NER backbone used by Presidio
+    "requests>=2.32.0,<3",       # HTTP client for Ollama API (honors HTTPS_PROXY)
+    "PyYAML>=6.0.1,<7",          # Custom entity profile loading
+    "PySide6>=6.6,<7",           # Desktop GUI (Phase 4)
 ]
 
 [project.optional-dependencies]
