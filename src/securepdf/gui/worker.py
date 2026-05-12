@@ -18,6 +18,13 @@ The worker emits four signals the GUI listens to:
 
 The worker takes a `WorkerJob` so callers configure exactly what to run; the
 worker itself doesn't know GUI state.
+
+Custom entity profiles
+----------------------
+A profile can be supplied either as a path to a YAML file on disk (the
+headless CLI path) OR as a YAML string in memory (the GUI path, where the
+entity editor dialog hands us back the live YAML). Either, never both —
+inline takes precedence if both are set.
 """
 
 from __future__ import annotations
@@ -28,7 +35,11 @@ from pathlib import Path
 
 from PySide6.QtCore import QObject, Signal, Slot
 
-from securepdf.detection.custom_entities import CustomEntityProfile, load_profile
+from securepdf.detection.custom_entities import (
+    CustomEntityProfile,
+    load_profile,
+    parse_profile,
+)
 from securepdf.detection.models import Detection
 from securepdf.pdf.models import PageContent
 
@@ -42,7 +53,8 @@ class WorkerJob:
     pdf_path: Path
     use_stage2: bool = True
     spacy_model: str = "en_core_web_sm"
-    profile_path: Path | None = None  # optional YAML custom entities
+    profile_path: Path | None = None  # optional YAML custom entities (from disk)
+    profile_yaml: str = ""  # optional YAML body (from GUI editor); wins over path
 
 
 class PipelineWorker(QObject):
@@ -79,7 +91,10 @@ class PipelineWorker(QObject):
             self.progress.emit(f"Extracted {len(pages)} pages", 20)
 
             profile: CustomEntityProfile | None = None
-            if job.profile_path:
+            if job.profile_yaml.strip():
+                self.progress.emit("Parsing custom entity profile…", 25)
+                profile = parse_profile(job.profile_yaml)
+            elif job.profile_path:
                 self.progress.emit("Loading custom entity profile…", 25)
                 profile = load_profile(job.profile_path)
 
