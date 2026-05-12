@@ -19,7 +19,7 @@ dependencies = [
     # release; upper bounds prevent surprise major-version breakage.
     "pymupdf>=1.24.10,<2",       # PDF text extraction WITH bboxes + true redaction primitives
     "pytesseract>=0.3.10,<1",    # Python wrapper over the system `tesseract` binary
-    "Pillow>=10.4.0,<12",        # Image handling for OCR page rendering (10.4+ CVE-fixed)
+    "Pillow>=10.4.0,<13",        # Image handling for OCR page rendering (10.4+ CVE-fixed)
     "presidio-analyzer>=2.2.355,<3",  # Stage 1: PII detection engine
     "spacy>=3.7,<4",             # NER backbone used by Presidio
     "requests>=2.32.0,<3",       # HTTP client for Ollama API (honors HTTPS_PROXY)
