@@ -1,6 +1,7 @@
 """SecurePDF desktop app entry point.
 
-Launches a QApplication, builds a `MainWindow`, and runs the event loop.
+Launches a QApplication, applies the editorial light theme, builds a
+`MainWindow`, and runs the event loop.
 
 CLI: `securepdf-gui` or `python -m securepdf.gui`.
 
@@ -26,14 +27,15 @@ def main(argv: list[str] | None = None) -> int:
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
 
-    # Import here, after logging is configured, so the MainWindow gets a clean
-    # logger configuration. Also keeps `import securepdf.gui` cheap when used
-    # from non-GUI consumers (e.g. the tests for `app.main` as a smoke check).
+    # Imports here, after logging is configured. Keeps `import securepdf.gui`
+    # cheap for non-GUI consumers (e.g. headless smoke tests on `app.main`).
     from securepdf.gui.main_window import MainWindow
+    from securepdf.gui.style import apply_editorial_style
 
     app = QApplication(argv if argv is not None else sys.argv)
     app.setApplicationName("SecurePDF")
     app.setOrganizationName("SecurePDF")
+    apply_editorial_style(app)
 
     window = MainWindow()
     window.show()
